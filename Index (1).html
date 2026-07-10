@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Kronova — Time, Refined</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0c1830">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Kronova">
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- Ambient background -->
+  <div class="ambient-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="noise-layer"></div>
+  </div>
+
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="9" stroke="url(#gradTop)" stroke-width="1.6"/>
+          <path d="M12 7.5V12L15 14" stroke="url(#gradTop)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <defs>
+            <linearGradient id="gradTop" x1="3" y1="3" x2="21" y2="21">
+              <stop stop-color="#5eead4"/>
+              <stop offset="1" stop-color="#38bdf8"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </span>
+      <span class="brand-name">Kronova</span>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-status" id="topbarStatus">
+        <span class="status-dot"></span>
+        <span id="nextAlarmLabel">No alarms set</span>
+      </div>
+      <button class="dev-gear-btn" id="btnDevOptions" aria-label="Developer options">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" stroke-width="1.6"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" stroke-width="1.6"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main content: screens -->
+  <main class="screens">
+
+    <!-- CLOCK SCREEN -->
+    <section class="screen active" id="screen-clock" data-screen="clock">
+      <div class="clock-hero glass-panel">
+        <div class="clock-ring">
+          <svg class="ring-svg" viewBox="0 0 300 300">
+            <circle class="ring-track" cx="150" cy="150" r="138"/>
+            <circle class="ring-progress" id="ringSeconds" cx="150" cy="150" r="138"/>
+          </svg>
+          <div class="clock-face">
+            <p class="clock-period" id="clockPeriod">AM</p>
+            <h1 class="clock-time" id="clockTime">00:00</h1>
+            <p class="clock-seconds"><span id="clockSeconds">00</span> sec</p>
+            <p class="clock-date" id="clockDate">Loading date…</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="quick-row">
+        <div class="quick-card glass-panel">
+          <span class="quick-label">Timezone</span>
+          <span class="quick-value" id="localTz">—</span>
+        </div>
+        <div class="quick-card glass-panel">
+          <span class="quick-label">Day of Year</span>
+          <span class="quick-value" id="dayOfYear">—</span>
+        </div>
+        <div class="quick-card glass-panel">
+          <span class="quick-label">Week</span>
+          <span class="quick-value" id="weekNumber">—</span>
+        </div>
+      </div>
+
+      <div class="section-heading">
+        <h2>Upcoming Alarm</h2>
+      </div>
+      <div class="upcoming-alarm glass-panel" id="upcomingAlarmCard">
+        <div class="upcoming-empty" id="upcomingEmpty">
+          <p>No alarms scheduled. Set one from the Alarm tab.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ALARM SCREEN -->
+    <section class="screen" id="screen-alarm" data-screen="alarm">
+      <div class="screen-header">
+        <h2>Alarms</h2>
+        <button class="btn-fab" id="btnAddAlarm" aria-label="Add alarm">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <ul class="alarm-list" id="alarmList">
+        <!-- alarm items injected -->
+      </ul>
+      <div class="empty-state glass-panel" id="alarmEmptyState">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 8V12L14.5 14.5M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="1.5"/></svg>
+        </div>
+        <p>No alarms yet</p>
+        <span>Tap the + button to create your first alarm</span>
+      </div>
+    </section>
+
+    <!-- TIMER SCREEN -->
+    <section class="screen" id="screen-timer" data-screen="timer">
+      <div class="screen-header">
+        <h2>Timer</h2>
+      </div>
+
+      <div class="timer-dial-wrap glass-panel">
+        <svg class="timer-dial" viewBox="0 0 300 300">
+          <circle class="dial-track" cx="150" cy="150" r="130"/>
+          <circle class="dial-progress" id="timerRing" cx="150" cy="150" r="130"/>
+        </svg>
+        <div class="timer-display">
+          <h1 id="timerDisplay">00:00:00</h1>
+          <p id="timerStateLabel">Ready</p>
+        </div>
+      </div>
+
+      <div class="timer-inputs" id="timerInputs">
+        <div class="time-input-group">
+          <input type="number" id="timerHours" min="0" max="23" value="0" inputmode="numeric">
+          <label>hrs</label>
+        </div>
+        <div class="time-input-group">
+          <input type="number" id="timerMinutes" min="0" max="59" value="5" inputmode="numeric">
+          <label>min</label>
+        </div>
+        <div class="time-input-group">
+          <input type="number" id="timerSecondsInput" min="0" max="59" value="0" inputmode="numeric">
+          <label>sec</label>
+        </div>
+      </div>
+
+      <div class="preset-row" id="timerPresets">
+        <button class="preset-chip" data-secs="60">1 min</button>
+        <button class="preset-chip" data-secs="180">3 min</button>
+        <button class="preset-chip" data-secs="300">5 min</button>
+        <button class="preset-chip" data-secs="600">10 min</button>
+        <button class="preset-chip" data-secs="1800">30 min</button>
+      </div>
+
+      <div class="control-row">
+        <button class="btn-secondary" id="btnTimerReset">Reset</button>
+        <button class="btn-primary" id="btnTimerStart">Start</button>
+      </div>
+    </section>
+
+    <!-- STOPWATCH SCREEN -->
+    <section class="screen" id="screen-stopwatch" data-screen="stopwatch">
+      <div class="screen-header">
+        <h2>Stopwatch</h2>
+      </div>
+
+      <div class="stopwatch-display glass-panel">
+        <h1 id="stopwatchDisplay">00:00<span class="ms">.00</span></h1>
+      </div>
+
+      <div class="control-row">
+        <button class="btn-secondary" id="btnLap">Lap</button>
+        <button class="btn-primary" id="btnStopwatchStart">Start</button>
+      </div>
+
+      <div class="laps-wrap">
+        <ul class="laps-list" id="lapsList"></ul>
+      </div>
+    </section>
+
+    <!-- WORLD CLOCK SCREEN -->
+    <section class="screen" id="screen-world" data-screen="world">
+      <div class="screen-header">
+        <h2>World Clock</h2>
+        <button class="btn-fab" id="btnAddCity" aria-label="Add city">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <ul class="world-list" id="worldList">
+        <!-- city cards injected -->
+      </ul>
+    </section>
+
+    <!-- CALENDAR SCREEN -->
+    <section class="screen" id="screen-calendar" data-screen="calendar">
+      <div class="screen-header">
+        <h2>Calendar</h2>
+      </div>
+
+      <div class="calendar-card glass-panel">
+        <div class="cal-nav">
+          <button class="cal-nav-btn" id="calPrev">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <h3 id="calMonthLabel">Month Year</h3>
+          <button class="cal-nav-btn" id="calNext">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <div class="cal-weekdays">
+          <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
+
+      <div class="section-heading">
+        <h2>Notes for <span id="calSelectedDateLabel">today</span></h2>
+      </div>
+      <div class="cal-note-card glass-panel">
+        <textarea id="calNoteInput" placeholder="Add a note for this day…" maxlength="300"></textarea>
+        <button class="btn-primary btn-block" id="btnSaveNote">Save Note</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Bottom navigation -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-target="clock">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M12 7.5V12L15 14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Clock</span>
+    </button>
+    <button class="nav-item" data-target="alarm">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 8V12L14.5 14.5M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="1.7"/></svg>
+      <span>Alarm</span>
+    </button>
+    <button class="nav-item" data-target="timer">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M10 2H14M12 2V5M12 22C16.4183 22 20 18.4183 20 14C20 9.58172 16.4183 6 12 6C7.58172 6 4 9.58172 4 14C4 18.4183 7.58172 22 12 22Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M12 10V14L14.5 15.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Timer</span>
+    </button>
+    <button class="nav-item" data-target="stopwatch">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="13" r="8" stroke="currentColor" stroke-width="1.7"/><path d="M12 9V13L14.5 14.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 2H15M12 2V5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      <span>Stopwatch</span>
+    </button>
+    <button class="nav-item" data-target="world">
+      <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M3 12H21M12 3C14.5 5.5 15.8 8.5 15.8 12C15.8 15.5 14.5 18.5 12 21C9.5 18.5 8.2 15.5 8.2 12C8.2 8.5 9.5 5.5 12 3Z" stroke="currentColor" stroke-width="1.7"/></svg>
+      <span>World</span>
+    </button>
+    <button class="nav-item" data-target="calendar">
+      <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M3 10H21M8 3V6M16 3V6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      <span>Calendar</span>
+    </button>
+  </nav>
+
+</div>
+
+<!-- ALARM EDITOR MODAL -->
+<div class="modal-overlay" id="alarmModalOverlay">
+  <div class="modal-sheet glass-panel" id="alarmModal">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title" id="alarmModalTitle">New Alarm</h3>
+
+    <div class="time-picker">
+      <div class="tp-col">
+        <button class="tp-btn tp-up" data-target="hour" data-dir="1">▲</button>
+        <div class="tp-value" id="tpHour">07</div>
+        <button class="tp-btn tp-down" data-target="hour" data-dir="-1">▼</button>
+      </div>
+      <div class="tp-sep">:</div>
+      <div class="tp-col">
+        <button class="tp-btn tp-up" data-target="minute" data-dir="1">▲</button>
+        <div class="tp-value" id="tpMinute">00</div>
+        <button class="tp-btn tp-down" data-target="minute" data-dir="-1">▼</button>
+      </div>
+      <div class="tp-col tp-meridiem">
+        <button class="tp-btn tp-up" data-target="meridiem" data-dir="1">▲</button>
+        <div class="tp-value" id="tpMeridiem">AM</div>
+        <button class="tp-btn tp-down" data-target="meridiem" data-dir="-1">▼</button>
+      </div>
+    </div>
+
+    <div class="modal-field">
+      <label>Label</label>
+      <input type="text" id="alarmLabelInput" placeholder="Alarm name" maxlength="30">
+    </div>
+
+    <div class="modal-field">
+      <label>Repeat</label>
+      <div class="day-selector" id="daySelector">
+        <button class="day-chip" data-day="0">S</button>
+        <button class="day-chip" data-day="1">M</button>
+        <button class="day-chip" data-day="2">T</button>
+        <button class="day-chip" data-day="3">W</button>
+        <button class="day-chip" data-day="4">T</button>
+        <button class="day-chip" data-day="5">F</button>
+        <button class="day-chip" data-day="6">S</button>
+      </div>
+    </div>
+
+    <div class="modal-field">
+      <label>Sound</label>
+      <select id="alarmSoundSelect">
+        <option value="classic">Classic Beep</option>
+        <option value="digital">Digital Pulse</option>
+        <option value="chime">Soft Chime</option>
+        <option value="siren">Siren</option>
+      </select>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-secondary" id="btnCancelAlarm">Cancel</button>
+      <button class="btn-primary" id="btnSaveAlarm">Save Alarm</button>
+    </div>
+    <button class="btn-delete" id="btnDeleteAlarm" style="display:none;">Delete Alarm</button>
+  </div>
+</div>
+
+<!-- ADD CITY MODAL -->
+<div class="modal-overlay" id="cityModalOverlay">
+  <div class="modal-sheet glass-panel" id="cityModal">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">Add City</h3>
+    <div class="modal-field">
+      <label>Search timezone</label>
+      <input type="text" id="citySearchInput" placeholder="e.g. Tokyo, London, New York">
+    </div>
+    <ul class="city-results" id="cityResults"></ul>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="btnCancelCity">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ALARM RINGING OVERLAY -->
+<div class="ringing-overlay" id="ringingOverlay">
+  <div class="ringing-content">
+    <div class="ringing-pulse"></div>
+    <svg class="ringing-icon" viewBox="0 0 24 24" fill="none"><path d="M12 8V12L14.5 14.5M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="1.5"/></svg>
+    <h1 id="ringingTime">07:00 AM</h1>
+    <p id="ringingLabel">Alarm</p>
+    <div class="ringing-actions">
+      <button class="btn-secondary" id="btnSnooze">Snooze 5 min</button>
+      <button class="btn-primary" id="btnDismiss">Dismiss</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- DEVELOPER OPTIONS: PASSWORD GATE -->
+<div class="modal-overlay" id="devPassOverlay">
+  <div class="modal-sheet glass-panel" id="devPassModal">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">Developer Options</h3>
+    <div class="modal-field">
+      <label>Enter Password</label>
+      <input type="password" id="devPassInput" placeholder="••••" maxlength="8" inputmode="numeric" autocomplete="off">
+      <p class="dev-error" id="devPassError">Incorrect password</p>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="btnCancelDevPass">Cancel</button>
+      <button class="btn-primary" id="btnSubmitDevPass">Unlock</button>
+    </div>
+  </div>
+</div>
+
+<!-- DEVELOPER OPTIONS: INFO PANEL -->
+<div class="modal-overlay" id="devInfoOverlay">
+  <div class="modal-sheet glass-panel" id="devInfoModal">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">Developer Options</h3>
+
+    <div class="dev-card">
+      <div class="dev-avatar">VM</div>
+      <div class="dev-name">Made by Vaibhav Misha</div>
+      <a class="dev-insta" id="devInstaLink" href="https://instagram.com/_vaibhav.45_" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
+        <span>@_vaibhav.45_</span>
+      </a>
+    </div>
+
+    <div class="dev-stats">
+      <div class="dev-stat-row"><span>App Version</span><span>1.0.0</span></div>
+      <div class="dev-stat-row"><span>Build</span><span id="devBuildDate">—</span></div>
+      <div class="dev-stat-row"><span>Alarms Stored</span><span id="devAlarmCount">0</span></div>
+      <div class="dev-stat-row"><span>Cities Stored</span><span id="devCityCount">0</span></div>
+      <div class="dev-stat-row"><span>Storage Used</span><span id="devStorageSize">0 KB</span></div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-secondary" id="btnResetData">Reset All Data</button>
+      <button class="btn-primary" id="btnCloseDevInfo">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
